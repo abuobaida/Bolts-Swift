@@ -81,7 +81,7 @@ extension Task {
 
      - returns: A task that will be completed with a result from a given closure.
      */
-    public func continueWith<S>(executor: Executor = .Default, continuation: (Task throws -> S)) -> Task<S> {
+    public func continueWith<S>(executor: Executor = .MainThread, continuation: (Task throws -> S)) -> Task<S> {
         return continueWithTask(executor) { task in
             let state = TaskState.fromClosure({
                 try continuation(task)
@@ -98,7 +98,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueWithTask<S>(executor: Executor = .Default, continuation: (Task throws -> Task<S>)) -> Task<S> {
+    public func continueWithTask<S>(executor: Executor = .MainThread, continuation: (Task throws -> Task<S>)) -> Task<S> {
         return continueWithTask(executor, options: .RunAlways, continuation: continuation)
     }
 }
@@ -116,7 +116,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnSuccessWith<S>(executor: Executor = .Default, continuation: (TResult throws -> S)) -> Task<S> {
+    public func continueOnSuccessWith<S>(executor: Executor = .MainThread, continuation: (TResult throws -> S)) -> Task<S> {
         return continueOnSuccessWithTask(executor) { taskResult in
             let state = TaskState.fromClosure({
                 try continuation(taskResult)
@@ -133,7 +133,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnSuccessWithTask<S>(executor: Executor = .Default, continuation: (TResult throws -> Task<S>)) -> Task<S> {
+    public func continueOnSuccessWithTask<S>(executor: Executor = .MainThread, continuation: (TResult throws -> Task<S>)) -> Task<S> {
         return continueWithTask(executor, options: .RunOnSuccess) { task in
             return try continuation(task.result!)
         }
@@ -153,7 +153,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnErrorWith<E: ErrorType>(executor: Executor = .Default, continuation: (E throws -> TResult)) -> Task {
+    public func continueOnErrorWith<E: ErrorType>(executor: Executor = .MainThread, continuation: (E throws -> TResult)) -> Task {
         return continueOnErrorWithTask(executor) { (error: E) in
             let state = TaskState.fromClosure({
                 try continuation(error)
@@ -170,7 +170,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnErrorWith(executor: Executor = .Default, continuation: (ErrorType throws -> TResult)) -> Task {
+    public func continueOnErrorWith(executor: Executor = .MainThread, continuation: (ErrorType throws -> TResult)) -> Task {
         return continueOnErrorWithTask(executor) { (error: ErrorType) in
             let state = TaskState.fromClosure({
                 try continuation(error)
@@ -187,7 +187,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnErrorWithTask<E: ErrorType>(executor: Executor = .Default, continuation: (E throws -> Task)) -> Task {
+    public func continueOnErrorWithTask<E: ErrorType>(executor: Executor = .MainThread, continuation: (E throws -> Task)) -> Task {
         return continueOnErrorWithTask(executor) { (error: ErrorType) in
             if let error = error as? E {
                 return try continuation(error)
@@ -204,7 +204,7 @@ extension Task {
 
      - returns: A task that will be completed when a task returned from a closure is completed.
      */
-    public func continueOnErrorWithTask(executor: Executor = .Default, continuation: (ErrorType throws -> Task)) -> Task {
+    public func continueOnErrorWithTask(executor: Executor = .MainThread, continuation: (ErrorType throws -> Task)) -> Task {
         return continueWithTask(executor, options: .RunOnError) { task in
             return try continuation(task.error!)
         }

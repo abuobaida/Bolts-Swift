@@ -107,7 +107,7 @@ public final class Task<TResult> {
      - parameter closure:  The closure that returns the result of the task.
      The returned task will complete when the closure completes.
      */
-    public convenience init(_ executor: Executor = .Default, closure: (Void throws -> TResult)) {
+    public convenience init(_ executor: Executor = .MainThread, closure: (Void throws -> TResult)) {
         self.init(state: .Pending())
         executor.execute {
             self.trySet(state: TaskState.fromClosure(closure))
@@ -123,7 +123,7 @@ public final class Task<TResult> {
 
      - returns: A task that will continue with the task returned by the given closure.
      */
-    public class func execute(executor: Executor = .Default, closure: (Void throws -> TResult)) -> Task {
+    public class func execute(executor: Executor = .MainThread, closure: (Void throws -> TResult)) -> Task {
         return Task(executor, closure: closure)
     }
 
@@ -136,7 +136,7 @@ public final class Task<TResult> {
 
      - returns: A task that will continue with the task returned by the given closure.
      */
-    public class func executeWithTask(executor: Executor = .Default, closure: (() throws -> Task)) -> Task {
+    public class func executeWithTask(executor: Executor = .MainThread, closure: (() throws -> Task)) -> Task {
         return emptyTask().continueWithTask(executor) { _ in
             return try closure()
         }
